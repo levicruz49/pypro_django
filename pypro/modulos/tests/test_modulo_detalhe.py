@@ -37,3 +37,12 @@ def test_publico(resp, modulo: Modulo):
 def test_aulas_titulos(resp, aulas):
     for aula in aulas:
         assert_contains(resp, aula.titulo)
+
+
+def test_descricao(resp, modulo: Modulo):
+    assert_contains(resp, modulo.descricao)
+
+
+def test_publico(resp, modulo: Modulo):
+    assert_contains(resp, modulo.publico)
+
