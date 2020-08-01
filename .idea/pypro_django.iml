@@ -29,6 +29,7 @@
       <list>
         <option value="$MODULE_DIR$/pypro/aperitivos/templates" />
         <option value="$MODULE_DIR$/pypro/base/templates" />
+        <option value="$MODULE_DIR$/pypro/modulos/templates" />
       </list>
     </option>
   </component>
