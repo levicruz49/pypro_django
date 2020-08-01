@@ -7,21 +7,23 @@ from pypro.modulos.models import Modulo
 
 
 @pytest.fixture
-def modulos(db):
-    return baker.make(Modulo, 2)
+def modulo(db):
+    return baker.make(Modulo)
 
 
 @pytest.fixture
-def resp(client, modulos):
-    resp = client.get(reverse('base:home'))
+def resp(client, modulo):
+    resp = client.get(reverse('modulos:detalhe', kwargs={'slug': modulo.slug}))
     return resp
 
 
-def test_titulo_dos_modulos(resp, modulos):
-    for modulo in modulos:
-        assert_contains(resp, modulo.titulo)
+def test_titulo(resp, modulo: Modulo):
+    assert_contains(resp, modulo.titulo)
 
 
-def test_link_dos_modulos(resp, modulos):
-    for modulo in modulos:
-        assert_contains(resp, modulo.get_absolute_url())
+def test_descricao(resp, modulo: Modulo):
+    assert_contains(resp, modulo.descricao)
+
+
+def test_publico(resp, modulo: Modulo):
+    assert_contains(resp, modulo.publico)
