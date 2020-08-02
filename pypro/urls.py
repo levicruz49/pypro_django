@@ -8,10 +8,12 @@ urlpatterns = [
     path('aperitivos/', include('pypro.aperitivos.urls')),
     path('modulos/', include('pypro.modulos.urls')),
     path('turmas/', include('pypro.turmas.urls')),
+    path('contas/', include('django.contrib.auth.urls')),
 ]
 
 if settings.DEBUG:
     import debug_toolbar
+
     urlpatterns.append(
         path('__debug__/', include(debug_toolbar.urls))
     )
