@@ -13,3 +13,10 @@ def detalhe(request, slug):
 def aula(request, slug):
     n = facade.econtrar_aula(slug)
     return render(request, 'modulos/aula_detalhe.html', {'aula': n})
+
+
+def indice(request):
+    ctx = {
+        'modulos': facade.listar_modulos_com_aulas()
+    }
+    return render(request, 'modulos/indice.html', ctx)
