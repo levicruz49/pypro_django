@@ -6,9 +6,10 @@ from pypro.modulos import facade
 
 def detalhe(request, slug):
     modulo = facade.encontrar_modulo(slug)
-    aulas = facade.liast_aula_de_modulo_ordenadas(modulo)
+    aulas = facade.lista_aula_de_modulo_ordenadas(modulo)
     return render(request, 'modulos/modulo_detalhe.html', {'modulo': modulo, 'aulas': aulas})
 
 
 def aula(request, slug):
-    pass
+    n = facade.econtrar_aula(slug)
+    return render(request, 'modulos/aula_detalhe.html', {'aula': n})
