@@ -1,0 +1,55 @@
+name: Portão Codex
+
+# Grava o status `codex-review` no HEAD do PR: vermelho até o Codex revisar
+# aquele commit. Antes só o hook de merge da sessão sabia; PR aberto sem
+# babysit-pr ficava parado sem ninguém ver (lume #11 e #12, 2026-10-24).
+#
+# Este workflow NÃO pede a revisão: o pedido continua com o babysit-pr
+# (pedir-codex-review.sh), que leva as regras do ambiente no comentário.
+#
+# Instalado por /home/mrcr/projetos/.agentes/scripts/instalar-portao-codex.sh.
+# Não editar a cópia no repo: mudar a fonte em .agentes e reinstalar.
+on:
+  # pull_request_target, não pull_request: o workflow e o script vêm do branch
+  # base. Com pull_request, a branch do PR poderia gravar success no próprio
+  # HEAD. Nenhum código do PR é baixado aqui.
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # Sem pull_request_review: esse evento roda o workflow da ref de merge do
+  # PR, o mesmo furo do pull_request. O Codex edita o comentário de resumo
+  # depois de publicar o review (lume #11: recibo 18:29:23, edição 18:29:24),
+  # e a edição chega por issue_comment, que roda o do branch padrão.
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+  statuses: write
+
+concurrency:
+  group: codex-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  codex-review:
+    # Comentário só conta se vier do bot; o resto não muda o veredito e
+    # queimaria o runner à toa.
+    if: >-
+      github.event_name == 'pull_request_target'
+      || (github.event.issue.pull_request
+          && github.event.comment.user.login == 'chatgpt-codex-connector[bot]')
+    # INVARIANTE DE SEGURANÇA: self-hosted só em repositório PRIVADO. Em repo
+    # público, PR de fork dispararia pull_request_target no runner do VPS.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: .github/codex
+          persist-credentials: false
+
+      - name: Status do Codex no HEAD
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 .github/codex/codex_status_ci.py
